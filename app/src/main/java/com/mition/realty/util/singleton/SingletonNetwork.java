@@ -26,6 +26,7 @@ public class SingletonNetwork {
 
     private SingletonNetwork() {
         connectionUser = new ConnectionUser();
+        connectionTransaction = new ConnectionTransaction();
     }
 
     public ConnectionUser getConnctionUser() {

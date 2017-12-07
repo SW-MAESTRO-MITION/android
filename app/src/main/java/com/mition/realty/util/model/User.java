@@ -8,10 +8,15 @@ import java.io.Serializable;
 
 public class User implements Serializable {
     public String _id;
+    public String createdAt;
+    public String updatedAt;
+
     public String name;
     public String email;
     public String password;
-    public String address;
+
+    //    public String address;
     public String transaction_id;
     public String type_of_party;
+    public boolean is_checked_registered_contract;
 }

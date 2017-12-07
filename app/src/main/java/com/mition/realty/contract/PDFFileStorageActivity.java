@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.mition.realty.R;
-import com.mition.realty.model.PDFFile;
+import com.mition.realty.util.model.PDFFile;
 
 import java.io.File;
 
@@ -58,8 +58,8 @@ public class PDFFileStorageActivity extends AppCompatActivity {
             if (file.isDirectory()) recursiveScan(file);
             if (file.isFile() && file.getPath().endsWith(".pdf")) {
                 PDFFile pdfFile = new PDFFile();
-                pdfFile.setName(file.getName());
-                pdfFile.setAbsolutepath(file.getAbsolutePath());
+                pdfFile.name=file.getName();
+                pdfFile.absolute_path = file.getAbsolutePath();
                 pdfFileStorageAdapter.addPdfFileList(pdfFile);
             }
         }

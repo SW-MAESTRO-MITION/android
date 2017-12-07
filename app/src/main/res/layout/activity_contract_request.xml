@@ -104,7 +104,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.367"
             android:background="@android:color/transparent"
-            android:hint="2017년 12월 30일"
+            android:hint="날짜를 선택해주세요.."
+            android:text=""
             android:textColor="#8f8f8f"
             android:textSize="14sp" />
 
@@ -151,6 +152,7 @@
             android:layout_weight="1.367"
             android:background="@android:color/transparent"
             android:hint="계약서 문서 파일"
+            android:text=""
             android:textColor="#8f8f8f"
             android:textSize="14sp" />
 

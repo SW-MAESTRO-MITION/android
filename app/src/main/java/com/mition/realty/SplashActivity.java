@@ -29,7 +29,7 @@ public class SplashActivity extends AppCompatActivity {
                 if (id != null && !id.equals("")) {
                     connectionGetUser(id);
                 } else {
-                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    Intent intent = new Intent(SplashActivity.this, LandingActivity.class);
                     startActivity(intent);
                     finish();
                 }

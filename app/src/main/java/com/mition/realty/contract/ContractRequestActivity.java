@@ -12,11 +12,25 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mition.realty.R;
-import com.mition.realty.model.PDFFile;
+import com.mition.realty.util.model.PDFFile;
+import com.mition.realty.util.model.Transaction;
+import com.mition.realty.util.model.User;
+import com.mition.realty.util.singleton.SingletonNetwork;
+import com.mition.realty.util.singleton.SingletonUser;
 
+import java.io.File;
+import java.net.URLConnection;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 
 public class ContractRequestActivity extends AppCompatActivity {
 
@@ -100,12 +114,34 @@ public class ContractRequestActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String email = et_email.getText().toString();
-//                contractYear;
-//                contractMonth;
-//                contractDay;
-//                pdfFile;
-                setResult(120);
-                finish();
+                if (email == null || email.equals("")) {
+                    Toast.makeText(ContractRequestActivity.this, "보내실 이메일을 입력해주세요..", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String pdfFileName = tv_file.getText().toString();
+                if (pdfFileName == null || pdfFileName.equals("")) {
+                    Toast.makeText(ContractRequestActivity.this, "보내실 계약서 파일을 첨부해주세요..", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String date = tv_date.getText().toString();
+                if (date == null || date.equals("")) {
+                    Toast.makeText(ContractRequestActivity.this, "계약 일자를 입력해주세요..", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                User user = SingletonUser.getInstance().getUser();
+                File file = new File(pdfFile.absolute_path);
+                String mimeType = URLConnection.guessContentTypeFromName(file.getName());
+
+                Map field = new HashMap();
+                field.put("sender_name", user.name);
+                field.put("sender", user.email);
+                field.put("recipient", et_email.getText().toString());
+                field.put("date", "" + contractYear + contractMonth + contractDay);
+
+                connectionUploadFile(field, file, mimeType);
             }
         });
     }
@@ -125,7 +161,56 @@ public class ContractRequestActivity extends AppCompatActivity {
         if (requestCode == 0 && resultCode == 100) {
             pdfFile = (PDFFile) data.getSerializableExtra("PDF_FILE");
             if (pdfFile == null) return;
-            tv_file.setText(pdfFile.getName());
+            tv_file.setText(pdfFile.name);
         }
+
+        // MultipartBody.Part is used to send also the actual file name
+    }
+//                uploadFile(RequestBody.create(MediaType.parse("application/pdf"), file)).
+
+    public void connectionUploadFile(final Map<String, Object> field, File file, String mimeType) {
+        Map<String, RequestBody> map = new HashMap<>();
+        RequestBody fileBody = RequestBody.create(MediaType.parse(mimeType), file);
+        map.put("contract_file\"; filename=\"" + file.getName(), fileBody);
+
+        SingletonNetwork.getInstance().getConnectionTransaction().uploadFile(map).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<PDFFile>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onNext(PDFFile pdfFile) {
+                        connectionCreateTransaction(field, pdfFile);
+                    }
+                });
+    }
+
+    public void connectionCreateTransaction(Map<String, Object> field, PDFFile pdfFile) {
+        field.put("absolute_path", pdfFile.absolute_path);
+        field.put("file_name", pdfFile.name);
+        SingletonNetwork.getInstance().getConnectionTransaction().
+                createTransaction(field).
+                observeOn(AndroidSchedulers.mainThread()).
+                subscribe(new Subscriber<Transaction>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onNext(Transaction user) {
+                        setResult(120);
+                        finish();
+                    }
+                });
     }
 }

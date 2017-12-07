@@ -37,8 +37,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Map field = new HashMap();
                 field.put("email", et_email.getText().toString());
-                field.put("password", et_email.getText().toString());
-
+                field.put("password", et_password.getText().toString());
                 connectionLogin(field);
             }
         });
@@ -64,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                         editor.commit();
 
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent);
                         finish();
                     }

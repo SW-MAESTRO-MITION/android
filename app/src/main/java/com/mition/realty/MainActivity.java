@@ -1,11 +1,15 @@
 package com.mition.realty;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -13,6 +17,7 @@ import android.widget.TextView;
 
 import com.mition.realty.contract.ContractRequestActivity;
 import com.mition.realty.contract.ContractStateActivity;
+import com.mition.realty.contract.PDFViewerActivity;
 import com.mition.realty.util.model.Transaction;
 import com.mition.realty.util.model.User;
 import com.mition.realty.util.singleton.SingletonNetwork;
@@ -29,7 +34,10 @@ public class MainActivity extends AppCompatActivity {
 
     LinearLayout ll_trasaction_container_for_recipient, ll_trasaction_container_for_sender;
     TextView tv_pdf, tv_accept;
+    ImageView iv_logout;
     ImageView iv_new_badge;
+
+    TextView tv_message, tv_accept_description;
 
     User user;
 
@@ -47,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
         ll_trasaction_container_for_recipient = findViewById(R.id.ll_trasaction_container_for_recipient);
         tv_accept = findViewById(R.id.tv_accept);
         tv_pdf = findViewById(R.id.tv_pdf);
+        iv_logout = findViewById(R.id.iv_logout);
+
+        tv_message = findViewById(R.id.tv_message);
+        tv_accept_description = findViewById(R.id.tv_accept_description);
 
         iv_nav_contract_request = findViewById(R.id.iv_nav_contract_request);
         iv_nav_contract_state = findViewById(R.id.iv_nav_contract_state);
@@ -62,26 +74,46 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, ContractStateActivity.class);
                 startActivity(intent);
-
-                SharedPreferences sharedPreferences = getSharedPreferences("SHARED_PREFERENCE", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("IS_CHECKED_REGISTERED_CONTRACT", true);
-                editor.commit();
+                iv_new_badge.setVisibility(View.GONE);
             }
         });
 
+        iv_logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setMessage("로그아웃 하시겠습니까?")
+                        .setPositiveButton("로그아웃", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                SharedPreferences sharedPreferences = getSharedPreferences("SHARED_PREFERENCE", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("USER_ID", null);
+                                editor.commit();
+
+                                Intent i = new Intent(MainActivity.this, LandingActivity.class);
+                                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                startActivity(i);
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+
+                            }
+                        })
+                        .show();
+            }
+        });
+
+        if (user.is_checked_registered_contract) {
+            iv_new_badge.setVisibility(View.GONE);
+        } else {
+            iv_new_badge.setVisibility(View.VISIBLE);
+        }
         refresh();
     }
 
     public void refresh() {
-        SharedPreferences sharedPreferences = getSharedPreferences("SHARED_PREFERENCE", MODE_PRIVATE);
-        boolean isCheckedRegisteredContract = sharedPreferences.getBoolean("IS_CHECKED_REGISTERED_CONTRACT", false);
-        if (!isCheckedRegisteredContract) {
-            iv_new_badge.setVisibility(View.VISIBLE);
-        } else {
-            iv_new_badge.setVisibility(View.GONE);
-        }
-
         if (user.transaction_id != null && !user.transaction_id.equals("")) {
             if (user.type_of_party.equals("sender")) {
                 connectionGetSenderTransaction(user.transaction_id);
@@ -98,8 +130,33 @@ public class MainActivity extends AppCompatActivity {
             Snackbar snackbar = Snackbar
                     .make(coordinatorlayout, "계약서 전송이 완료되었습니다.", Snackbar.LENGTH_LONG);
             snackbar.show();
-            UIThreadForSender();
+            connectionGetUser(user._id);
         }
+    }
+
+    public void connectionGetUser(String id) {
+        SingletonNetwork.getInstance().getConnctionUser().getUser(id).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<User>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+
+                    @Override
+                    public void onNext(User user) {
+                        SingletonUser.getInstance().setUser(user);
+                        if (user.transaction_id != null && !user.transaction_id.equals("")) {
+                            if (user.type_of_party.equals("sender")) {
+                                connectionGetSenderTransaction(user.transaction_id);
+                            } else if (user.type_of_party.equals("recipient")) {
+                                connectionGetRecipientTransaction(user.transaction_id);
+                            }
+                        }
+                    }
+                });
     }
 
     public void connectionGetSenderTransaction(String id) {
@@ -173,15 +230,19 @@ public class MainActivity extends AppCompatActivity {
         ll_trasaction_container_for_sender.setVisibility(View.GONE);
         ll_trasaction_container_for_recipient.setVisibility(View.VISIBLE);
 
-        tv_pdf.setText(transaction.file_name);
+        tv_message.setText(transaction.sender_name + "님으로부터 계약서가 도착하였습니다.");
+        tv_accept_description.setText(transaction.sender_name + "님이 요청한 계약을 수락하시겠습니까?");
+
+        tv_pdf.setText(fromHtml("<u>" + transaction.file_name + "</u>"));
         tv_pdf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(activity, PDFViewerActivity.class);
-//                intent.putExtra("PDF_FILE", pdfFile);
-//                activity.startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, PDFViewerActivity.class);
+                intent.putExtra("PDF_FILE_PATH", transaction.path);
+                startActivity(intent);
             }
         });
+
 
         tv_accept.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -192,5 +253,17 @@ public class MainActivity extends AppCompatActivity {
                 connectionAcceptTransaction(transaction._id);
             }
         });
+    }
+
+    // Html.fromHtml deprecated in Android N
+    @SuppressWarnings("deprecation")
+    public static Spanned fromHtml(String html) {
+        Spanned result;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            result = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            result = Html.fromHtml(html);
+        }
+        return result;
     }
 }

@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ffffff"
-    android:orientation="vertical"
-    tools:context="com.example.dn2757.oatm.gogobang.LoginActivity">
+    android:orientation="vertical">
 
     <View
         android:layout_width="match_parent"
@@ -45,10 +44,12 @@
             android:textSize="14sp" />
 
         <EditText
+            android:id="@+id/et_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.367"
             android:background="@android:color/transparent"
+            android:maxLines="1"
             android:hint="gogobang"
             android:inputType="text"
             android:textColor="#8f8f8f"
@@ -84,17 +85,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.634"
-            android:text="패스워드"
+            android:text="이메일"
             android:textColor="#548edf"
             android:textSize="14sp" />
 
         <EditText
+            android:id="@+id/et_email"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.367"
             android:background="@android:color/transparent"
-            android:hint="********"
-            android:inputType="textPassword"
+            android:maxLines="1"
+            android:hint="gogobang@gogo.bang"
+            android:inputType="textEmailAddress"
             android:textColor="#8f8f8f"
             android:textSize="16sp" />
 
@@ -129,17 +132,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.634"
-            android:text="이메일"
+            android:text="패스워드"
             android:textColor="#548edf"
             android:textSize="14sp" />
 
         <EditText
+            android:id="@+id/et_password"
+            android:maxLines="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.367"
             android:background="@android:color/transparent"
-            android:hint="gogobang@gogo.bang"
-            android:inputType="textEmailAddress"
+            android:hint="********"
+            android:inputType="textPassword"
             android:textColor="#8f8f8f"
             android:textSize="16sp" />
 
@@ -175,10 +180,10 @@
         <TextView
             android:id="@+id/tv_nav_cancel"
             android:layout_width="0dp"
-            android:layout_weight="89"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginRight="8dp"
+            android:layout_weight="89"
             android:background="@drawable/background_button_cancel"
             android:gravity="center"
             android:paddingBottom="13.5dp"
@@ -190,9 +195,9 @@
         <TextView
             android:id="@+id/tv_nav_complete"
             android:layout_width="0dp"
-            android:layout_weight="168"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_weight="168"
             android:background="@drawable/background_button"
             android:gravity="center"
             android:paddingBottom="13.5dp"

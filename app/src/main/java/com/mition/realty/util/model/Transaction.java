@@ -9,6 +9,7 @@ import java.io.Serializable;
 public class Transaction implements Serializable {
     public String _id;
     public String sender;
+    public String sender_name;
     public String recipient;
     public String path;
     public String file_name;

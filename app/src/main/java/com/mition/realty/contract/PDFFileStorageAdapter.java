@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mition.realty.R;
-import com.mition.realty.model.PDFFile;
+import com.mition.realty.util.model.PDFFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +45,10 @@ public class PDFFileStorageAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         PDFFileViewHolder viewHolder = (PDFFileViewHolder) holder;
         final PDFFile pdfFile = pdfFileList.get(position);
-        viewHolder.tv_pdffile.setText(pdfFile.getName());
 
-        if (pdfFile.isChecked) {
+        viewHolder.tv_pdffile.setText(pdfFile.name);
+
+        if (pdfFile.is_checked) {
             viewHolder.iv_file_selected.setVisibility(View.VISIBLE);
         } else {
             viewHolder.iv_file_selected.setVisibility(View.GONE);
@@ -74,9 +75,9 @@ public class PDFFileStorageAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     private void setAllFileUnchecked(int position) {
         for (PDFFile pdfFile : pdfFileList) {
-            pdfFile.isChecked = false;
+            pdfFile.is_checked = false;
         }
-        pdfFileList.get(position).isChecked = true;
+        pdfFileList.get(position).is_checked = true;
     }
 
     @Override

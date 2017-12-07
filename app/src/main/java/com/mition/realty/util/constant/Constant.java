@@ -5,5 +5,5 @@ package com.mition.realty.util.constant;
  */
 
 public class Constant {
-    static public final String SERVER_URL = "http://10.70.13.93:3000/";
+    static public final String SERVER_URL = "http://172.16.101.144:3000/";
 }

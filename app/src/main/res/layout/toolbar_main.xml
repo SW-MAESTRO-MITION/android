@@ -19,6 +19,16 @@
             android:text="GoGoBang"
             android:textColor="#b5b5b5"
             android:textSize="16sp" />
+
+
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/iv_logout"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/icon_logout"
+        android:tint="#6ca6e2" />
 </android.support.v7.widget.Toolbar>

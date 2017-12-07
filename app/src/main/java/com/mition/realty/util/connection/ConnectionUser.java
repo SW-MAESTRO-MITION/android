@@ -22,6 +22,10 @@ public class ConnectionUser {
         return conn.getUser(id).subscribeOn(Schedulers.newThread());
     }
 
+    public Observable<User> modifyUser(String id, Map<String, Object> field) {
+        return conn.modifyUser(id, field).subscribeOn(Schedulers.newThread());
+    }
+
     public Observable<User> login(Map<String, Object> field) {
         return conn.login(field).subscribeOn(Schedulers.newThread());
     }
